@@ -37,11 +37,16 @@ public final class Ellipsoid {
 	public static final Ellipsoid INT_1924 = withAxes(6378388.000, 6356911.946);
 
 	// used for GPS
-	public static final Ellipsoid WGS84 = withAxes(6378137.000, 6356752.314);
-	public static final Ellipsoid GRS80 = withAxes(6378137.000, 6356752.314); // TODO inverse flattening
+	public static final Ellipsoid WGS84 = withAxisAndInvFlat(6378137.000, 298.257223563);
+	public static final Ellipsoid GRS80 = withAxisAndInvFlat(6378137.000, 298.257222101);
 
 	public static Ellipsoid withAxes(double major, double minor) {
 		return canonical(new Ellipsoid(major, minor));
+	}
+
+	public static Ellipsoid withAxisAndInvFlat(double major, double inverseFlattening) {
+		double ratio = 1 - 1.0 / inverseFlattening;
+		return canonical(new Ellipsoid(major, major * ratio));
 	}
 
 	public final double a; // semi-major axis
