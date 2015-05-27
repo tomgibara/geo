@@ -1,6 +1,6 @@
 /*
  * Copyright 2012 Tom Gibara
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 
 package com.tomgibara.geo;
@@ -26,37 +26,37 @@ public class OSGridTest extends GeoTest {
 	private GridRef ref(int e, int n) {
 		return system.createGridRef(e, n);
 	}
-	
+
 	private GridRef ref(String str) {
 		return grid.refFromString(system, str);
 	}
-	
+
 	public void testBasic() {
-		
+
 		assertEquals(ref(216650, 771250), ref("NN166712"));
 		assertEquals(ref(216650, 771250), ref("NN 166712"));
 		assertEquals(ref(216650, 771250), ref("NN166 712"));
 		assertEquals(ref(216650, 771250), ref("NN 166 712"));
 		assertEquals(ref(216650, 771250), ref("NN   166   712"));
-		
+
 		ref("NN");
 		ref("NN12");
 		ref("NN1234");
 		ref("NN123456");
 		ref("NN12345678");
 		ref("NN1234567890");
-		
+
 		assertBad("NN 1660 712");
 		assertBad("NN 1234567 1234567");
 		assertBad("AI 123 456");
 		assertBad("IA 123 456");
-		
+
 		checkFormat("NN");
 		checkFormat("NN17");
 		checkFormat("NN1671");
 		checkFormat("NN 166 712");
 	}
-	
+
 	private void checkFormat(String str) {
 		assertEquals(str, grid.refToString(ref(str)));
 	}
@@ -68,5 +68,5 @@ public class OSGridTest extends GeoTest {
 			/* expected */
 		}
 	}
-	
+
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright 2012 Tom Gibara
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 
 package com.tomgibara.geo;
@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 
 /**
  * Common functionality for the OS and OSI grids.
- * 
+ *
  * @author Tom Gibara
  */
 
@@ -54,18 +54,18 @@ class GridHelper {
 	private static int coordinate(String str) {
 		return str.isEmpty() ? 0 : Integer.parseInt(str);
 	}
-	
+
 	private static char indexToChar(int i) {
 		if (i < 0 || i > 24) return '?';
 		return (char) (i > 7 ? 'B' + i : 'A' + i);
 	}
-	
+
 	private final boolean singleLetter;
-	
+
 	GridHelper(boolean singleLetter) {
 		this.singleLetter = singleLetter;
 	}
-	
+
 	GridRef refFromString(GridRefSystem system, String str) {
 		// simple case first
 		Matcher matcher = sNoSquares.matcher(str);
@@ -80,7 +80,7 @@ class GridHelper {
 		Pattern pattern = singleLetter ? sSingleSquares : sDoubleSquares;
 		matcher = pattern.matcher(str);
 		if (!matcher.matches()) throw new IllegalArgumentException("Invalid reference: " + str);
-		
+
 		int e, n;
 		if (singleLetter) {
 			char k = Character.toUpperCase( str.charAt(0) );
@@ -102,10 +102,10 @@ class GridHelper {
 		if (length == -1) length = coords.length() / 2;
 		int x = coordinate(coords.substring(0, length));
 		int y = coordinate(coords.substring(coords.length() - length));
-		
+
 		int scale = sScales[length];
 		int center = sCenters[length];
-		
+
 		return system.createGridRef(
 				e + x * scale + center,
 				n + y * scale + center
@@ -157,5 +157,5 @@ class GridHelper {
 			return String.format(sDoubleFormats[length], c, k, x, y);
 		}
 	}
-	
+
 }

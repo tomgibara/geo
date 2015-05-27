@@ -1,6 +1,6 @@
 /*
  * Copyright 2012 Tom Gibara
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 
 package com.tomgibara.geo;
@@ -22,7 +22,7 @@ import static com.tomgibara.geo.GeoUtil.arcSecsToRads;
 /**
  * A transformation that operates by translating, scaling and rotating
  * coordinates in 3D space.
- * 
+ *
  * @author Tom Gibara
  */
 
@@ -40,9 +40,9 @@ public class HelmertTransform implements CartesianTransform {
 	public final double rx; // rotation about x (rad)
 	public final double ry; // rotation about y (rad)
 	public final double rz; // rotation about z (rad)
-	
+
 	private final double s1; // scale factor plus one
-	
+
 	private HelmertTransform(double cx, double cy, double cz, double s, double rx, double ry, double rz) {
 		this.cx = cx;
 		this.cy = cy;
@@ -51,7 +51,7 @@ public class HelmertTransform implements CartesianTransform {
 		this.rx = rx;
 		this.ry = ry;
 		this.rz = rz;
-		s1 = 1 + s; 
+		s1 = 1 + s;
 	}
 
 	public Cartesian transform(Cartesian source) {
@@ -61,12 +61,12 @@ public class HelmertTransform implements CartesianTransform {
 		double tz = cz - x * ry + y * rx + z * s1;
 		return Cartesian.inMeters(tx, ty, tz);
 	}
-	
+
 	@Override
 	public HelmertTransform getInverse() {
 		return new HelmertTransform(-cx, -cy, -cz, -s, -rx, -ry, -rz);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return GeoUtil.hashCode(s)
@@ -94,10 +94,10 @@ public class HelmertTransform implements CartesianTransform {
 		if (this.rz != that.rz) return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "(" + cx + "," + cy + "," + cz + ") " + s + "[" + rx + "," + ry + "," + rz + "]";
 	}
-	
+
 }

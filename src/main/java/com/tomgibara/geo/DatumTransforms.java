@@ -1,6 +1,6 @@
 /*
  * Copyright 2012 Tom Gibara
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 
 package com.tomgibara.geo;
@@ -24,14 +24,14 @@ import java.util.Map;
 
 /**
  * A collection of transforms that can transform points defined in different datums.
- * 
+ *
  * @author Tom Gibara
  */
 
 public class DatumTransforms {
 
 	private static final DatumTransforms defaultTransforms;
-	
+
 	static {
 		DatumTransforms dts = new DatumTransforms();
 		dts.addTransform(
@@ -44,23 +44,23 @@ public class DatumTransforms {
 				);
 		defaultTransforms = dts.immutableCopy();
 	}
-	
+
 	public static DatumTransforms getDefaultTransforms() {
 		return defaultTransforms;
 	}
-	
+
 	private final Map<Mapping, CartesianTransform> transforms;
 	private final Map<Datum, Map<Datum, CartesianTransform>> transformsBySource;
 	private final Map<Datum, Map<Datum, CartesianTransform>> transformsByTarget;
 	private final boolean immutable;
-	
+
 	public DatumTransforms() {
 		transforms = new HashMap<DatumTransforms.Mapping, CartesianTransform>();
 		transformsBySource = new LinkedHashMap<Datum, Map<Datum, CartesianTransform>>();
 		transformsByTarget = new LinkedHashMap<Datum, Map<Datum, CartesianTransform>>();
 		immutable = false;
 	}
-	
+
 	private DatumTransforms(DatumTransforms that, boolean immutable) {
 		this.transforms = new HashMap<DatumTransforms.Mapping, CartesianTransform>(that.transforms);
 		this.transformsBySource = new LinkedHashMap<Datum, Map<Datum, CartesianTransform>>(that.transformsBySource);
@@ -71,7 +71,7 @@ public class DatumTransforms {
 	public boolean isImmutable() {
 		return immutable;
 	}
-	
+
 	public boolean addTransform(Datum source, Datum target, CartesianTransform transform) {
 		if (source == null) throw new IllegalArgumentException("null source");
 		if (target == null) throw new IllegalArgumentException("null target");
@@ -85,21 +85,21 @@ public class DatumTransforms {
 		addTransform(mapping.getInverse(), transform.getInverse());
 		return true;
 	}
-	
+
 	public DatumTransform getTransform(Datum target) {
 		if (target == null) throw new IllegalArgumentException("null target datum");
 		if (!immutable) throw new IllegalStateException("transforms not immutable");
 		return new DatumTransformImpl(target);
 	}
-	
+
 	public DatumTransforms immutableCopy() {
 		return immutable ? this : new DatumTransforms(this, true);
 	}
-	
+
 	public DatumTransforms mutableCopy() {
 		return new DatumTransforms(this, false);
 	}
-	
+
 	private void addTransform(Mapping mapping, CartesianTransform transform) {
 		transforms.put(mapping, transform);
 		addTransform(transformsBySource, mapping, transform);
@@ -114,12 +114,12 @@ public class DatumTransforms {
 		}
 		map.put(mapping.target, transform);
 	}
-	
+
 	private static class Mapping {
-		
+
 		private final Datum source;
 		private final Datum target;
-		
+
 		public Mapping(Datum source, Datum target) {
 			this.source = source;
 			this.target = target;
@@ -143,19 +143,19 @@ public class DatumTransforms {
 			if (!this.target.equals(that.target)) return false;
 			return true;
 		}
-		
+
 	}
-	
+
 	private class DatumTransformImpl implements DatumTransform {
-		
+
 		private final Datum target;
 		private final Map<Datum, CartesianTransform> transforms;
-		
+
 		DatumTransformImpl(Datum target) {
 			this.target = target;
 			transforms = transformsByTarget.get(target);
 		}
-		
+
 		@Override
 		public LatLonHeight transform(LatLonHeight latLonHeight) {
 			Datum source = latLonHeight.getLatLon().getDatum();
@@ -175,7 +175,7 @@ public class DatumTransforms {
 			}
 			return cartesian.toLatLonHeight(target);
 		}
-		
+
 	}
-	
+
 }

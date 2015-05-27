@@ -1,6 +1,6 @@
 /*
  * Copyright 2012 Tom Gibara
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 
 package com.tomgibara.geo;
@@ -23,20 +23,20 @@ import static java.lang.Math.toRadians;
 /**
  * Combines a grid (for deriving eastings and northings) with a datum (with
  * which to establish their longitude and latitude),
- * 
+ *
  * @author Tom Gibara
  */
 
 public final class GridRefSystem {
 
 	public static final GridRefSystem OSGB36 = withDatumAndGrid(Datum.OSGB36, OSGrid.instance);
-	
+
 	public static final GridRefSystem OSI65 = withDatumAndGrid(Datum.OSI65, OSIGrid.instance);
 
 	public static GridRefSystem withDatumAndGrid(Datum datum, Grid grid) {
 		return canonical(new GridRefSystem(datum, grid));
 	}
-	
+
 	private final Datum datum;
 	private final Grid grid;
 
@@ -46,11 +46,11 @@ public final class GridRefSystem {
 		this.datum = datum;
 		this.grid = grid;
 	}
-	
+
 	public Datum getDatum() {
 		return datum;
 	}
-	
+
 	public Grid getGrid() {
 		return grid;
 	}
@@ -58,11 +58,11 @@ public final class GridRefSystem {
 	public GridRef createGridRef(String str) {
 		return grid.refFromString(this, str);
 	}
-	
+
 	public GridRef createGridRef(int easting, int northing) {
 		return new GridRef(this, easting, northing);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return datum.hashCode() ^ grid.hashCode();
@@ -77,7 +77,7 @@ public final class GridRefSystem {
 		if (!this.datum.equals(that.datum)) return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		return datum + " " + grid;
@@ -90,7 +90,7 @@ public final class GridRefSystem {
 		double N0 = datum.N0, F0 = datum.F0, E0 = datum.E0, lat0 = datum.lat0, lon0 = datum.lon0;
 		double a = ellipsoid.a, b = ellipsoid.b, e2 = ellipsoid.e2;
 		double n = ellipsoid.n, n2 = ellipsoid.n2, n3 = ellipsoid.n3;
-		
+
 		double lat = lat0, M = 0;
 		do {
 			lat = (N-N0-M)/(a*F0) + lat;
@@ -100,7 +100,7 @@ public final class GridRefSystem {
 			double Md = (35.0/24.0)*n3 * Math.sin(3*(lat-lat0)) * Math.cos(3*(lat+lat0));
 			M = b * F0 * (Ma - Mb + Mc - Md);					// meridional arc
 		} while (N-N0-M >= 0.00001);							// ie until < 0.01mm
-		
+
 		double cosLat = Math.cos(lat), sinLat = Math.sin(lat);
 		double nu = a*F0/Math.sqrt(1-e2*sinLat*sinLat);		// transverse radius of curvature
 		double rho = a*F0*(1-e2)/Math.pow(1-e2*sinLat*sinLat, 1.5);  // meridional radius of curvature
@@ -124,7 +124,7 @@ public final class GridRefSystem {
 
 		return datum.createLatLonRadians(lat, lon);
 	}
-	
+
 	GridRef latLonToGridRef(LatLon latLon) {
 		double lat = toRadians(latLon.getLatitude());
 		double lon = toRadians(latLon.getLongitude());
@@ -133,7 +133,7 @@ public final class GridRefSystem {
 		double F0 = datum.F0, N0 = datum.N0, E0 = datum.E0, lat0 = datum.lat0, lon0 = datum.lon0;
 		double a = ellipsoid.a, b = ellipsoid.b, e2 = ellipsoid.e2;
 		double n = ellipsoid.n, n2 = ellipsoid.n2, n3 = ellipsoid.n3;
-		
+
 		double cosLat = Math.cos(lat), sinLat = Math.sin(lat);
 		double nu = a*F0/Math.sqrt(1-e2*sinLat*sinLat);		// transverse radius of curvature
 		double rho = a*F0*(1-e2)/Math.pow(1-e2*sinLat*sinLat, 1.5);  // meridional radius of curvature
@@ -152,15 +152,15 @@ public final class GridRefSystem {
 		double I = M + N0;
 		double II = nu/2*sinLat*cosLat;
 		double III = nu/24*sinLat*cos3lat*(5-tan2lat+9*eta2);
-		double IIIA = nu/720*sinLat*cos5lat*(61-58*tan2lat+tan4lat); 
+		double IIIA = nu/720*sinLat*cos5lat*(61-58*tan2lat+tan4lat);
 		double IV = nu*cosLat;
 		double V = nu/6*cos3lat*(nu/rho-tan2lat);
 		double VI = nu/120*cos5lat*(5-18*tan2lat+tan4lat+14*eta2-58*tan2lat*eta2);
-		
+
 		double dL = (lon-lon0), dL2 = dL*dL, dL3 = dL2*dL, dL4 = dL2*dL2, dL5 = dL3*dL2, dL6 = dL4*dL2;
 		double N = I + II*dL2 + III*dL4 + IIIA*dL6;
 		double E = E0 + IV*dL + V*dL3 + VI*dL5;
-		
+
 		//TODO should eastings and northings be integrals?
 		return new GridRef(this, (int) E, (int) N);
 	}

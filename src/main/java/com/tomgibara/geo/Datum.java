@@ -1,6 +1,6 @@
 /*
  * Copyright 2012 Tom Gibara
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 
 package com.tomgibara.geo;
@@ -24,7 +24,7 @@ import static java.lang.Math.toRadians;
 
 /**
  * A reference against which position measurements may be made.
- * 
+ *
  * @author Tom Gibara
  */
 
@@ -38,7 +38,7 @@ public class Datum {
 			400000,
 			-100000
 			);
-	
+
 	public static final Datum WSG84 = withDegreesMeters(
 			Ellipsoid.WGS84,
 			1,
@@ -47,7 +47,7 @@ public class Datum {
 			0,
 			0
 			);
-	
+
 	public static final Datum OSI65 = withDegreesMeters(
 			Ellipsoid.MODIFIED_AIRY,
 			0.99999185,
@@ -56,7 +56,7 @@ public class Datum {
 			200000,
 			250000
 			);
-	
+
 	public static Datum withDegreesMeters(
 			Ellipsoid ellipsoid,
 			double scaleFactor,
@@ -67,16 +67,16 @@ public class Datum {
 			) {
 		return canonical(new Datum(ellipsoid, scaleFactor, trueOriginLatitude, trueOriginLongitude, trueOriginEastings, trueOriginNorthings));
 	}
-	
+
 	final Ellipsoid ellipsoid;
 	final double F0; // scale factor
 	final double lat0; // latitude of true origin (radians)
 	final double lon0; // longitude of true origin (radians)
 	final double E0; // eastings of true origin (metres)
 	final double N0; // northing of true origin (metres)
-	
+
 	private final LatLon trueOrigin;
-	
+
 	private Datum(Ellipsoid ellipsoid, double F0, double lat0, double lon0, double E0, double N0) {
 		if (ellipsoid == null) throw new IllegalArgumentException("null ellipsoid");
 		if (!isCoordinate(F0)) throw new IllegalArgumentException("invalid scale");
@@ -91,7 +91,7 @@ public class Datum {
 		this.lon0 = toRadians(lon0);
 		this.E0 = E0;
 		this.N0 = N0;
-		
+
 		trueOrigin = createLatLonDegrees(lat0, lon0);
 	}
 
@@ -102,29 +102,29 @@ public class Datum {
 	public LatLon getTrueOrigin() {
 		return trueOrigin;
 	}
-	
+
 	public double getScaleFactor() {
 		return F0;
 	}
-	
+
 	//meters
 	public double getTrueOriginEastings() {
 		return E0;
 	}
-	
+
 	//metres
 	public double getTrueOriginNorthings() {
 		return N0;
 	}
-	
+
 	public LatLon createLatLonDegrees(double lat, double lon) {
 		return new LatLon(this, lat, lon);
 	}
-	
+
 	public LatLon createLatLonRadians(double lat, double lon) {
 		return new LatLon(this, toDegrees(lat), toDegrees(lon));
 	}
-	
+
 	Cartesian latLonHeightToCartesian(LatLonHeight latLonHeight) {
 		LatLon latLon = latLonHeight.getLatLon();
 		double lat = Math.toRadians(latLon.getLatitude()), lon = Math.toRadians(latLon.getLongitude()), h = latLonHeight.getHeight();
@@ -147,14 +147,14 @@ public class Datum {
 		double s = Math.sin(lat);
 		double v = ellipsoid.a / (Math.sqrt(1 - e2 * s * s));
 		do {
-		    double lat0 = Math.atan((z + e2 * v * Math.sin(lat)) / p);  
-		    if (Math.abs(lat0 - lat) < 0.00001) break;
-		    lat = lat0;
+			double lat0 = Math.atan((z + e2 * v * Math.sin(lat)) / p);
+			if (Math.abs(lat0 - lat) < 0.00001) break;
+			lat = lat0;
 		} while (true);
 		double h = p / Math.cos(lat) - v;
 		return createLatLonRadians(lat, lon).atHeight(h);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return ellipsoid.hashCode()
@@ -166,7 +166,7 @@ public class Datum {
 						+ GeoUtil.hashCode(N0)
 						);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) return true;
@@ -180,7 +180,7 @@ public class Datum {
 		if (!this.ellipsoid.equals(that.ellipsoid)) return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		return ellipsoid.toString()
@@ -190,5 +190,5 @@ public class Datum {
 				+ " N:" + N0 + "m"
 				+ " scale: " + F0;
 	}
-	
+
 }
