@@ -1,5 +1,5 @@
 # geo
-Geographic coordinate library.
+A geographic coordinate library for Java.
 
 Overview
 --------
