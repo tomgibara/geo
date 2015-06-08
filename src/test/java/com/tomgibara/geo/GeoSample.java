@@ -2,6 +2,7 @@ package com.tomgibara.geo;
 
 public class GeoSample {
 
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 
 		/*
